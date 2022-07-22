@@ -1,75 +1,80 @@
 const current = document.querySelector('.current');
-const chain = document.querySelector('.chain');
-
 const buttonNodeList = document.querySelectorAll('.button');
 
-let operation = {
+let expression = {
   firstNumber: '',
   operator: '',
   secondNumber: '',
 };
 
-const operate = (obj) => {
-  if (obj.operator == '/' && obj.secondNumber == '0') {
-    return 'ERROR';
-  } 
-  obj.firstNumber = eval(`${obj.firstNumber}${obj.operator}${obj.secondNumber}`)
-  obj.operator = '';
-  obj.secondNumber = '';
-  return obj.firstNumber;
+const operate = (expression) => {
+  expression.firstNumber = eval(`${expression.firstNumber}${expression.operator}${expression.secondNumber}`);
+  expression.operator = '';
+  expression.secondNumber = '';
+  return expression.firstNumber;
 }
 
 const displayValue = (value, format) => {
-  let display = current.textContent;
   if (format == 'add') {
-    return display += value;
+    if (current.textContent == '0') {
+      return current.textContent = value;
+    }
+    return current.textContent += value;
   }
   else if (format == 'changeTheLast') {
-    return display = display.slice(0, display.length - 1) + value;
+    return current.textContent = current.textContent.slice(0, current.textContent.length - 1) + value;
   }
-  return display = value;
+  return current.textContent = value;
+}
+
+const clear = () => {
+  expression.firstNumber = '';
+  expression.operator = '';
+  expression.secondNumber = '';
 }
 
 buttonNodeList.forEach(item => {
   item.addEventListener('click', () => {
     const value = item.textContent;
     if (value == 'C') {
-      operation.firstNumber = '';
-      operation.operator = '';
-      operation.secondNumber = '';
-      displayValue('');
+      clear();
+      displayValue('0');
     }
+
     else if (value == '=') {
-      operate(operation);
-      displayValue(operation.firstNumber)
+      if (expression.firstNumber != '') { // if the equal is clicked before everything
+        operate(expression);
+        displayValue(expression.firstNumber);
+      }
     }
+
     else if (['+', '-', '*', '/'].indexOf(value) != -1) {
-      // IF the operator is not yet selected
-      if (operation.operator == '') {
-        operation.operator = value;
-        displayValue(value, 'add')
-      }
-      // ELSE IF the second number is not yet selected,
-      // the behavior is: change the operator based on clicks 
-      else if (operation.secondNumber == '') {
-        operation.operator = value;
-        displayValue(value, 'changeTheLast')
-      }
-      // ELSE if want to chain operations without pushing equal sign
-      else {
-        operate(operation); // return the result
-        displayValue(operate(operation) + value); // display result + new sign
-        operation.operator += value; // add the new sign in the operation obj
+      if (expression.firstNumber != '') { // if a sign is clicked before everything
+        if (expression.operator == '') {
+          expression.operator = value;
+          displayValue(value, 'add')
+        }
+        else if (expression.secondNumber == '') {
+          expression.operator = value;
+          displayValue(value, 'changeTheLast')
+        }
+        else {
+          operate(expression); // return the result
+          displayValue(operate(expression) + value); // display result + new sign
+          expression.operator = value; // add the new sign in the expression obj
+        }
       }
     }
+
     else {
-      if (operation.operator == '') { //
-        operation.firstNumber += value;
-      } else {
-        operation.secondNumber += value;
+      if (expression.operator == '') {
+        expression.firstNumber += value;
       }
-      displayValue(value, 'add')
+      else {
+        expression.secondNumber += value;
+      }
+      displayValue(value, 'add');
     }
-    console.log(operation)
+    console.log(expression)
   })
 })
