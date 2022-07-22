@@ -1,0 +1,90 @@
+/* ---------- IMPORTED FONTS ---------- */
+
+
+/* ---------- DEFAULT VALUES ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(136, 119, 119);
+}
+#calculator-body {
+  width: 300px;
+  font-size: 1.5rem;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  padding: 15px;
+  border-radius: 10px;
+  font-family: 'Red Hat Mono', monospace;
+  /* box-shadow: 4px 4px $oxford-blue; */
+  word-wrap: break-word;
+}
+.display {
+  padding: 20px;
+  /* background-color: $maximum-green;
+  border-top: 5px solid $bone-dark;
+  border-left: 5px solid $bone-dark;
+  border-bottom: 5px solid $bone;
+  border-right: 5px solid $bone; */
+  text-align: right;
+  /* color: $white; */
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.chain {
+  opacity: 0.9;
+  font-size: 1rem;
+}
+.current::after {
+  content: '|';
+  margin-right: -9px;
+  font-size: 2rem;
+  animation: blink 1s step-start infinite;
+}
+@keyframes blink {
+  20% { opacity: 0; }
+}
+.button-grid {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  cursor: pointer;
+  grid-gap: 10px;
+}
+.button {
+  /* border-bottom: 3px solid $bone-dark;
+  border-right: 3px solid $bone-dark;
+  background-color: $bone; */
+  border-radius: 5px;
+  padding: 12px;
+  text-align: center;
+}
+/* .button:active {
+  border-top: 3px solid $bone-dark;
+  border-left: 3px solid $bone-dark;
+  border-bottom: 5px solid $bone;
+  border-right: 5px solid $bone; */
+/* } */
+.clear {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  text-align: left;
+  padding-left: 25px;
+}
+.zero {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  text-align: left;
+  padding-left: 25px;
+}
+.equals {
+}
