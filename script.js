@@ -9,6 +9,7 @@ let expression = {
   secondNumber: '',
   evaluated: false
 };
+let display = '0';
 
 /* ------------------- MATH OPERATION ------------------- */
 const operate = (expression) => {
@@ -22,11 +23,7 @@ const operate = (expression) => {
 
 /* ------------------- DISPLAY FUNCTION ------------------- */
 const displayValue = (display) => {
-  let textContent = current.textContent;
   if (display[1] == 'add') {
-    if (current.textContent == '0') {
-      return current.textContent = display[0];
-    }
     return current.textContent += display[0];
   }
   else if (display[1] == 'changeTheLast') {
@@ -44,36 +41,46 @@ const clear = () => {
   expression.operator = '';
   expression.secondNumber = '';
   expression.evaluated = false;
+  display = '0'
+}
+
+/* ------------------- CLICK HANDLERS ------------------- */
+const handleEquals = () => {
+  if (expression.firstNumber) { // if the firstNumber is not empty
+    if (expression.operator) { // if the operator is set
+      if (!expression.secondNumber) { // but the secondNumber is not set
+        expression.operator = '' // then remove the last operator
+      } 
+    }
+    operate(expression);
+    display = [operate(expression)];
+  }
+  else { // if equals is pressed before everything or after a clear
+    display = '0';
+  }
+  return display;
+}
+
+const handleOperators = () => {
+
 }
 
 /* ------------------- CLICK LISTENER ------------------- */
 buttonNodeList.forEach(item => {
   item.addEventListener('click', () => {
     const value = item.textContent;
-    let display;
     if (value == 'C') {
       clear();
-      display = '0';
     }
 
     else if (value == '=') {
-      if (expression.firstNumber) { // if the firstNumber is not empty
-        if (expression.operator) { // if the operator is set
-          if (!expression.secondNumber) { // but the secondNumber is not set
-            expression.operator = '' // then remove the last operator
-          } 
-        }
-        operate(expression);
-        display = [operate(expression)];
-      }
-      else { // if equals is pressed before everything or after a clear
-        display = '0';
-      }
+      handleEquals();
     }
 
-    else if (['+', '-', '*', '/'].indexOf(value) != -1) {
+    else if (['+', '-', '*', '/'].includes(value)) {
+      // handleOperators();
       if (expression.firstNumber) { // if the firstNumber is already set
-        if (!expression.operator) {
+        if (!expression.operator) { // if the operator is not set yet
           expression.operator = value;
           display = [value, 'add'];
         }
@@ -92,20 +99,29 @@ buttonNodeList.forEach(item => {
       }
     }
 
-    // else if (value == '.') {
-    //   if (expression.operator == '') {
-    //     if (expression.firstNumber.indexOf('.') == -1) {
-    //       expression.firstNumber += value;
-    //       display = [value, 'add'];
-    //     }
-    //   } 
-    //   else if (expression.operator != '') {
-    //     if (expression.secondNumber.indexOf('.') == -1) {
-    //       expression.secondNumber += value;
-    //       display = [value, 'add'];
-    //     } 
-    //   }
-    // }
+    else if (expression.firstNumber == '0' || expression.firstNumber == '') { // particular cas of the first digited
+      if (value == '0') { // do nothing, refresh only display
+        display = [value, 'changeTheLast'];
+      }
+      else { // do like any other number
+        if (!expression.operator) {
+          expression.firstNumber = value;
+          display = [value, 'changeTheLast'];
+        }
+      }
+    }
+
+    else if (expression.secondNumber == '0') {
+      if (value == '0') { // do nothing, refresh only display
+        display = [value, 'changeTheLast'];
+      }
+      else { // do like any other number
+        if (expression.operator) {
+          expression.secondNumber = value;
+          display = [value, 'changeTheLast'];
+        }
+      }
+    }
 
     else {
       if (!expression.operator) {
@@ -118,7 +134,7 @@ buttonNodeList.forEach(item => {
           display = [value, 'add'];
         }
       }
-      else {
+      else if (expression.operator) {
         expression.secondNumber += value;
         display = [value, 'add'];
       }

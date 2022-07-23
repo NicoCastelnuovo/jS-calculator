@@ -1,14 +1,28 @@
 /* ---------- IMPORTED FONTS ---------- */
-
+@font-face {
+  font-family: 'RedHatMono';
+  font-weight: 300;
+  src: url(./fonts/RedHatMono-Light.ttf) format('truetype');
+}
 
 /* ---------- DEFAULT VALUES ---------- */
+:root {
+  --blue-dark: #0A122A;
+  --white: #FBFAF8;
+  --grey: #E7DECD;
+  --grey-dark: #bdb19b;
+  --green: #698F3F;
+  --yellow: #d4b413;
+  --red: #804E49;
+}
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
 body {
+  font-family: 'RedHatMono', Verdana, sans-serif;
+  font-size: 1.5rem;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -17,25 +31,24 @@ body {
 }
 #calculator-body {
   width: 300px;
-  font-size: 1.5rem;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
   padding: 15px;
   border-radius: 10px;
-  font-family: 'Red Hat Mono', monospace;
-  /* box-shadow: 4px 4px $oxford-blue; */
   word-wrap: break-word;
+  background-color: var(--white);
+  box-shadow: 4px 4px var(--blue-dark);
 }
 .display {
   padding: 20px;
-  /* background-color: $maximum-green;
-  border-top: 5px solid $bone-dark;
+  background-color: var(--green);
+  /* border-top: 5px solid $bone-dark;
   border-left: 5px solid $bone-dark;
   border-bottom: 5px solid $bone;
   border-right: 5px solid $bone; */
   text-align: right;
-  /* color: $white; */
+  color: var(--white);
   border-radius: 10px;
   margin-bottom: 10px;
 }
@@ -57,13 +70,15 @@ body {
   height: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  cursor: pointer;
   grid-gap: 10px;
 }
 .button {
+  border: none;
+  font-size: 1.5rem;
+  font-family: 'RedHatMono', Verdana, sans-serif;
   /* border-bottom: 3px solid $bone-dark;
-  border-right: 3px solid $bone-dark;
-  background-color: $bone; */
+  border-right: 3px solid $bone-dark; */
+  background-color: var(--grey);
   border-radius: 5px;
   padding: 12px;
   text-align: center;
@@ -79,6 +94,7 @@ body {
   grid-column-end: 3;
   text-align: left;
   padding-left: 25px;
+  background-color: var(--yellow);
 }
 .zero {
   grid-column-start: 1;
@@ -87,4 +103,5 @@ body {
   padding-left: 25px;
 }
 .equals {
+  background-color: var(--red);
 }
