@@ -1,11 +1,11 @@
-/* ---------- IMPORTED FONTS ---------- */
+/* ---------------- IMPORTED FONTS ---------------- */
 @font-face {
   font-family: 'RedHatMono';
   font-weight: 300;
   src: url(./fonts/RedHatMono-Light.ttf) format('truetype');
 }
 
-/* ---------- DEFAULT VALUES ---------- */
+/* ---------------- DEFAULT VALUES ---------------- */
 :root {
   --blue-dark: #0A122A;
   --white: #FBFAF8;
@@ -13,7 +13,7 @@
   --grey-dark: #bdb19b;
   --green: #698F3F;
   --yellow: #d4b413;
-  --red: #804E49;
+  --red: #d44133;
 }
 * {
   margin: 0;
@@ -30,7 +30,7 @@ body {
   background-color: rgb(136, 119, 119);
 }
 #calculator-body {
-  width: 300px;
+  min-width: 300px;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
@@ -38,15 +38,13 @@ body {
   border-radius: 10px;
   word-wrap: break-word;
   background-color: var(--white);
-  box-shadow: 4px 4px var(--blue-dark);
+  border-right: 6px outset;
+  border-bottom: 6px outset;
 }
 .display {
   padding: 20px;
   background-color: var(--green);
-  /* border-top: 5px solid $bone-dark;
-  border-left: 5px solid $bone-dark;
-  border-bottom: 5px solid $bone;
-  border-right: 5px solid $bone; */
+  border: 3px inset;
   text-align: right;
   color: var(--white);
   border-radius: 10px;
@@ -73,28 +71,25 @@ body {
   grid-gap: 10px;
 }
 .button {
-  border: none;
-  font-size: 1.5rem;
   font-family: 'RedHatMono', Verdana, sans-serif;
-  /* border-bottom: 3px solid $bone-dark;
-  border-right: 3px solid $bone-dark; */
+  font-size: 1.5rem;
+  border: none;
+  border: 2px outset;
   background-color: var(--grey);
   border-radius: 5px;
   padding: 12px;
   text-align: center;
 }
-/* .button:active {
-  border-top: 3px solid $bone-dark;
-  border-left: 3px solid $bone-dark;
-  border-bottom: 5px solid $bone;
-  border-right: 5px solid $bone; */
-/* } */
+.button:active {
+  border: 2px inset;
+}
 .clear {
   grid-column-start: 1;
   grid-column-end: 3;
   text-align: left;
   padding-left: 25px;
   background-color: var(--yellow);
+  color: var(--white);
 }
 .zero {
   grid-column-start: 1;
@@ -104,4 +99,13 @@ body {
 }
 .equals {
   background-color: var(--red);
+  color: var(--white);
+}
+
+/* ---------------- MEDIA QUERIES ---------------- */
+@media screen and (max-width: 480px) {
+  #calculator-body {
+    width: 100vw;
+    height: 100vh;
+  }
 }
