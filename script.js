@@ -29,6 +29,9 @@ const displayValue = (display) => {
   else if (display[1] == 'changeTheLast') {
     return current.textContent = current.textContent.slice(0, current.textContent.length - 1) + display[0];
   }
+  else if (display[1] == 'removeTheLast') {
+    return current.textContent = current.textContent.slice(0, current.textContent.length - 1);
+  }
   else if (display[0] == 'Infinity' || display[0] == undefined) {
     return current.textContent = 'ERROR';
   }
@@ -37,6 +40,8 @@ const displayValue = (display) => {
 
 /* ------------------- RESET FUNCTION ------------------- */
 const clear = () => {
+  expression.currentNumber = '';
+  expression.lastDigit = '';
   expression.firstNumber = '';
   expression.operator = '';
   expression.secondNumber = '';
@@ -95,7 +100,55 @@ buttonNodeList.forEach(item => {
         }
       }
       else if (!expression.firstNumber) { // if the firstNumber is not set yet
-        display = '0';
+        display = ['', 'add'];
+      }
+    }
+
+    else if (value == '.') {
+      if (!expression.operator) {
+        if (expression.firstNumber == '0' || expression.firstNumber == '') {
+          expression.firstNumber += '0' + value;
+          display = [value, 'add'];
+        }
+        else {
+          if (!expression.firstNumber.includes('.')) { // if the number has no dot yet
+            expression.firstNumber += value;
+            display = [value, 'add'];
+          }
+          else { // if the number has already a dot: toggle or nothing
+            if (expression.firstNumber[expression.firstNumber.length - 1] == '.') {
+              expression.firstNumber = expression.firstNumber.slice(0, expression.firstNumber.length - 1);
+              display = [value, 'removeTheLast'];
+            }
+            else {
+              display = ['', 'add']
+            }
+          }
+        }
+      }
+      else {
+        if (expression.secondNumber == '0') {
+          expression.secondNumber += value;
+          display = [value, 'add'];
+        }
+        else if (expression.secondNumber == '') {
+          display = ['', 'add'];
+        }
+        else {
+          if (!expression.secondNumber.includes('.')) { // if the number has no dot yet
+            expression.secondNumber += value;
+            display = [value, 'add'];
+          }
+          else { // if the number has already a dot: toggle or nothing
+            if (expression.secondNumber[expression.secondNumber.length - 1] == '.') {
+              expression.secondNumber = expression.secondNumber.slice(0, expression.secondNumber.length - 1);
+              display = [value, 'removeTheLast'];
+            }
+            else {
+              display = ['', 'add']
+            }
+          }
+        }
       }
     }
 
@@ -124,8 +177,8 @@ buttonNodeList.forEach(item => {
     }
 
     else {
-      if (!expression.operator) {
-        if (expression.evaluated === true) {
+      if (!expression.operator) { // firstNumber is digited
+        if (expression.evaluated === true) { // if this happend after evaluation
           clear();
           expression.firstNumber = value;
           display = [value];
@@ -134,7 +187,7 @@ buttonNodeList.forEach(item => {
           display = [value, 'add'];
         }
       }
-      else if (expression.operator) {
+      else if (expression.operator) { // secondNumber is digited
         expression.secondNumber += value;
         display = [value, 'add'];
       }
