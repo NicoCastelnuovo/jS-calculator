@@ -4,20 +4,20 @@ const buttonNodeList = document.querySelectorAll('.button');
 
 /* ------------------- GLOBAL VARIABLES ------------------- */
 let expression = {
-  firstNumber: '',
+  firstTerm: '',
   operator: '',
-  secondNumber: '',
+  secondTerm: '',
   evaluated: false
 };
-let display = '0';
+let display = [''];
 
 /* ------------------- MATH OPERATION ------------------- */
 const operate = (expression) => {
-    expression.firstNumber = eval(`${expression.firstNumber}${expression.operator}${expression.secondNumber}`).toString();
+    expression.firstTerm = eval(`${expression.firstTerm}${expression.operator}${expression.secondTerm}`).toString();
     expression.operator = '';
-    expression.secondNumber = '';
+    expression.secondTerm = '';
     expression.evaluated = true;
-    return expression.firstNumber;
+    return '=' + expression.firstTerm;
 }
 
 /* ------------------- DISPLAY FUNCTION ------------------- */
@@ -26,10 +26,10 @@ const displayValue = (display) => {
     return current.textContent += display[0];
   }
   else if (display[1] == 'changeTheLast') {
-    return current.textContent = current.textContent.slice(0, current.textContent.length - 1) + display[0];
+    return current.textContent = removeLastDigit(current.textContent) + display[0];
   }
   else if (display[1] == 'removeTheLast') {
-    return current.textContent = current.textContent.slice(0, current.textContent.length - 1);
+    return current.textContent = removeLastDigit(current.textContent);
   }
   else if (display[0] == 'Infinity' || display[0] == undefined) {
     return current.textContent = 'ERROR';
@@ -39,18 +39,23 @@ const displayValue = (display) => {
 
 /* ------------------- RESET FUNCTION ------------------- */
 const clear = () => {
-  expression.firstNumber = '';
+  expression.firstTerm = '';
   expression.operator = '';
-  expression.secondNumber = '';
+  expression.secondTerm = '';
   expression.evaluated = false;
-  display = ['0'];
+  display = [''];
 }
 
-/* ------------------- CLICK HANDLERS ------------------- */
+/* ------------------- SHARED FUNCTIONS / PATTERNS ------------------- */
+const removeLastDigit = (n) => {
+  return n = n.slice(0, n.length - 1);
+}
+
+/* ------------------- HANDLERS ------------------- */
 const handleEquals = () => {
-  if (expression.firstNumber) { // if the firstNumber is not empty
+  if (expression.firstTerm) { // if the firstTerm is not empty
     if (expression.operator) { // if the operator is set
-      if (!expression.secondNumber) { // but the secondNumber is not set
+      if (!expression.secondTerm) { // but the secondTerm is not set
         expression.operator = '' // then remove the last operator
       } 
     }
@@ -63,7 +68,7 @@ const handleEquals = () => {
   return display;
 }
 
-const handleOperators = () => {
+const handleDecimalPoint = () => {
 
 }
 
@@ -85,28 +90,28 @@ buttonNodeList.forEach(item => {
     }
 
     else if (['+', '-', '*', '/'].includes(value)) {
-      // handleOperators();
-      if (expression.firstNumber[expression.firstNumber.length - 1] == '.') {
-        expression.firstNumber = expression.firstNumber.slice(0, expression.firstNumber.length - 1);
+      // if the last clicked was the decimal sign, remove it first
+      if (expression.firstTerm[expression.firstTerm.length - 1] == '.') {
+        expression.firstTerm = removeLastDigit(expression.firstTerm);
         displayValue(['', 'removeTheLast']);
       }
-      if (expression.firstNumber) { // if the firstNumber is already set
+      if (expression.firstTerm == '') { // if the firstTerm is not set yet
+        display = ['', 'add'];
+      }
+      else if (expression.firstTerm != '') { // if the firstTerm is already set
         if (!expression.operator) { // if the operator is not set yet
           expression.operator = value;
           display = [value, 'add'];
         }
-        else if (!expression.secondNumber) { // if we are selecting the operator multiple times
+        else if (!expression.secondTerm) { // if we are selecting the operator multiple times
           expression.operator = value;
           display = [value, 'changeTheLast']
         }
-        else { // if I set the secondNumber and press another or the same operator
+        else { // if I set the secondTerm and press operator
           operate(expression); // return the result of the expression
           display = [operate(expression) + value]; // save for display
           expression.operator = value; // add the new sign in the expression obj
         }
-      }
-      else if (!expression.firstNumber) { // if the firstNumber is not set yet
-        display = ['', 'add'];
       }
     }
 
@@ -116,17 +121,18 @@ buttonNodeList.forEach(item => {
         if (expression.evaluated === true) { // decimal behavior after equals: like operators
           expression.evaluated = false;
         }
-        if (expression.firstNumber == '') {
-          expression.firstNumber += '0' + value;
-          display = [value, 'add'];
+        // handleDecimalPoint(expression.firstTerm);
+        if (expression.firstTerm == '') {
+          expression.firstTerm += '0' + value;
+          display = ['0' + value, 'add'];
         }
-        else if (!expression.firstNumber.includes(value)) {
-          expression.firstNumber += value;
+        else if (!expression.firstTerm.includes(value)) {
+          expression.firstTerm += value;
           display = [value, 'add'];
         }
         else {
-          if (expression.firstNumber[expression.firstNumber.length - 1] == '.') { // remove the last ony if it's the dot
-            expression.firstNumber = expression.firstNumber.slice(0, expression.firstNumber.length - 1);
+          if (expression.firstTerm[expression.firstTerm.length - 1] == '.') { // remove the last ony if it's the dot
+            expression.firstTerm = removeLastDigit(expression.firstTerm);
             display = ['', 'removeTheLast'];
           }
           else {
@@ -135,16 +141,17 @@ buttonNodeList.forEach(item => {
         }
       }
       else { // second term decimal (SAME FUNCTION, MERGE)
-        if (expression.secondNumber == '') {
-          display = ['', 'add'];
+        if (expression.secondTerm == '') {
+          expression.secondTerm += '0' + value;
+          display = ['0' + value, 'add'];
         }
-        else if (!expression.secondNumber.includes(value)) {
-          expression.secondNumber += value;
+        else if (!expression.secondTerm.includes(value)) {
+          expression.secondTerm += value;
           display = [value, 'add'];
         }
         else {
-          if (expression.secondNumber[expression.secondNumber.length - 1] == '.') { // remove the last ony if it's the dot
-            expression.secondNumber = expression.secondNumber.slice(0, expression.secondNumber.length - 1);
+          if (expression.secondTerm[expression.secondTerm.length - 1] == '.') { // remove the last ony if it's the dot
+            expression.secondTerm = removeLastDigit(expression.secondTerm);
             display = ['', 'removeTheLast'];
           }
           else {
@@ -155,28 +162,28 @@ buttonNodeList.forEach(item => {
     }
 
     else {
-      if (!expression.operator) { // firstNumber digiting rules
-        if (expression.firstNumber == '0' || expression.firstNumber == '') {
-          expression.firstNumber = value; // managing the zero at the beginning
+      if (!expression.operator) { // firstTerm digiting rules
+        if (expression.firstTerm == '0' || expression.firstTerm == '') {
+          expression.firstTerm = value; // managing the zero at the beginning
           display = [value];
         }
         else if (expression.evaluated === true) { // behavior right after evaluation: clear
           clear();
-          expression.firstNumber = value;
+          expression.firstTerm = value;
           display = [value];
         }
         else {
-          expression.firstNumber += value;
+          expression.firstTerm += value;
           display = [value, 'add'];
         }
       }
-      else if (expression.operator) { // secondNumber digiting rules
-        if (expression.secondNumber == '0') {
-          expression.secondNumber = value; // managing the zero at the beginning
+      else if (expression.operator) { // secondTerm digiting rules
+        if (expression.secondTerm == '0') {
+          expression.secondTerm = value; // managing the zero at the beginning
           display = [value, 'changeTheLast'];
         }
         else {
-          expression.secondNumber += value;
+          expression.secondTerm += value;
           display = [value, 'add'];
         }
       }
