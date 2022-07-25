@@ -192,3 +192,25 @@ buttonNodeList.forEach(item => {
     console.log(expression)
   })
 })
+
+/* ------------------- DARK MODE ------------------- */
+const darkMode = document.querySelector('.dark-mode');
+const calculatorBody = document.querySelector('.calculator-body');
+const body = document.querySelector('body');
+const iconDarkMode = document.querySelector('.dark-mode>img')
+
+darkMode.addEventListener('click', () => {
+  body.classList.toggle('dark-body');
+  calculatorBody.classList.toggle('dark-calculator');
+  buttonNodeList.forEach(item => {
+    item.classList.toggle('dark-button');
+  })
+  darkMode.classList.toggle('dark-button')
+  if (iconDarkMode.getAttribute('src') == './images/moon.svg') {
+    iconDarkMode.setAttribute('src', './images/sun.svg');
+    iconDarkMode.classList.add('change-icon-color');
+  } else {
+    iconDarkMode.setAttribute('src', './images/moon.svg');
+    iconDarkMode.classList.remove('change-icon-color');
+  }
+})
