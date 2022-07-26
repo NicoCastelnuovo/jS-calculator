@@ -12,6 +12,7 @@
   --grey: #E7DECD;
   --grey-dark: #bdb19b;
   --green: #698F3F;
+  --green-dark: #3f532a;
   --yellow: #d4b413;
   --red: #d44133;
 }
@@ -29,6 +30,12 @@ body {
   align-items: center;
   background-color: rgb(136, 119, 119);
 }
+button {
+  cursor: pointer;
+  border: 3px outset;
+  border-radius: 5px;
+  padding: 12px;
+}
 .calculator-body {
   min-width: 300px;
   display: flex;
@@ -41,7 +48,7 @@ body {
   border-bottom: 6px outset;
   background-color: var(--grey);
 }
-.display {
+.screen {
   padding: 20px;
   border: 3px inset;
   text-align: right;
@@ -50,9 +57,8 @@ body {
   margin-bottom: 10px;
   background-color: var(--green);
 }
-.chain {
-  opacity: 0.9;
-  font-size: 1rem;
+.screen.off {
+  background-color: var(--green-dark);
 }
 .current::after {
   content: '|';
@@ -63,21 +69,33 @@ body {
 @keyframes blink {
   20% { opacity: 0; }
 }
+.off::after {
+  content: '';
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 9px;
+  padding: 0 0 12px 3px;
+}
+h1 {
+  font-size: 1.5rem;
+  color: var(--grey-dark);
+}
+h1:hover {
+  color: #726d64;
+}
 .button-grid {
   width: 100%;
   height: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-gap: 10px;
-  
 }
 .dark-mode, .button {
   font-family: 'RedHatMono', Verdana, sans-serif;
   font-size: 1.5rem;
-  border: none;
-  border: 2px outset;
-  border-radius: 5px;
-  padding: 12px;
   text-align: center;
   background-color: var(--grey);
 }
@@ -109,12 +127,20 @@ body {
 .dark-button {
   color: var(--white);
   background-color: #13151b;
+  border: 3px outset #343947;
 }
 
 /* ---------------- EXCEPTION STYLE BUTTONS ---------------- */
+.switchOnOff {
+  width: 80px;
+  background-color: var(--grey-dark);
+  font-family: 'RedHatMono';
+}
+.switchOnOff:active {
+  border: 2px inset;
+}
 .clear {
-  grid-column-start: 1;
-  grid-column-end: 3;
+
   text-align: left;
   padding-left: 25px;
   color: var(--white);
