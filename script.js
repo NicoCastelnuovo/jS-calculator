@@ -2,246 +2,232 @@
 const current = document.querySelector('.current');
 const buttonNodeList = document.querySelectorAll('.button');
 
-/* ------------------- GLOBAL VARIABLES ------------------- */
+/* ------------------- GLOBALS ------------------- */
 let expression = {
-  firstTerm: '',
-  operator: '',
-  secondTerm: '',
+  a: '',
+  operator: '', 
+  b: '',
   evaluated: false
-};
-let display = [''];
+}
+let display = '';
 
-/* ------------------- MATH OPERATION ------------------- */
+/* ------------------- BASIC MATH FUNCTIONS ------------------- */
+const sum = (a, b) => {
+  return a + b;
+}
+const subtract = (a, b) => {
+  return a - b;
+}
+const multiply = (a, b) => {
+  return a * b;
+}
+const divide = (a, b) => {
+  if (a / b == 'Infinity') {
+    return 'Error';
+  }
+  return a / b;
+}
+
+/* ------------------- OPERATE FUNCTION ------------------- */
 const operate = (expression) => {
-  let totalLength = (expression.firstTerm + expression.secondTerm).length;
-  if (totalLength > 10 && (expression.firstTerm + expression.secondTerm).includes('.')) {
-    expression.firstTerm = eval(`${expression.firstTerm}${expression.operator}${expression.secondTerm}`).toFixed(6);
+  let a = parseFloat(expression.a)
+  let b = parseFloat(expression.b)
+  let result;
+  if (!a) { return 'Error'}
+  if (!b) { return 'Error'}
+  if (expression.operator == '+') {
+    result = sum(a, b);
+  } 
+  else if (expression.operator == '-') {
+    result = subtract(a, b);
   }
-  else {
-    expression.firstTerm = eval(`${expression.firstTerm}${expression.operator}${expression.secondTerm}`).toString();
+  else if (expression.operator == '*') {
+    result = multiply(a, b);
   }
-  expression.operator = '';
-  expression.secondTerm = '';
-  expression.evaluated = true;
-  return expression.firstTerm;
-}
+  else if (expression.operator == '/') {
+    result = divide(a, b);
+  }
+  if (result % 1 != 0) {
+    return parseFloat(result.toFixed(4));
+  }
+  return result;
+};
 
-/* ------------------- DISPLAY FUNCTION ------------------- */
-const displayValue = (display) => {
-  if (display[1] == 'add') {
-    current.textContent += display[0];
-  }
-  else if (display[1] == 'changeTheLast') {
-    current.textContent = removeLastDigit(current.textContent) + display[0];
-  }
-  else if (display[1] == 'removeTheLast') {
-    current.textContent = removeLastDigit(current.textContent);
-  }
-  else if (display[0] == 'Infinity' || display[0] == undefined || display[0] == 'NaN') {
-    current.textContent = 'ERROR';
-  }
-  else {
-    current.textContent = display[0];
-  }
-  return current.textContent;
+// const updateDisplay = (value) => {
+//   current.textContent = value;
+// }
+const updateDisplay = () => {
+  current.textContent = expression.a + expression.operator + expression.b;
 }
-
-/* ------------------- REUSABLE FUNCTIONS ------------------- */
 
 const removeLastDigit = (n) => {
-  return n = n.slice(0, n.length - 1);
+  return n.slice(0, n.length - 1);
 }
 
-/* ------------------- HANDLERS ------------------- */
-const handleClear = () => {
-  expression.firstTerm = '';
-  expression.operator = '';
-  expression.secondTerm = '';
-  expression.evaluated = false;
-  display = [''];
+const checkError = () => {
+  if (expression.a == 'Error') {
+    clear();
+  }
+}
+
+const clear = () => {
+  expression = {
+    a: '',
+    operator: '', 
+    b: '',
+    evaluated: false
+  }
+  display = '';
 }
 
 const handleBackspace = () => {
   if (!expression.operator) {
-    if (expression.firstTerm == 'Infinity' || expression.firstTerm == 'NaN') {
-      expression.firstTerm = '';
-      expression.evaluated = false;
-      display= [''];
+    expression.a = removeLastDigit(expression.a);
+  }
+  else {
+    if (!expression.b) {
+      expression.operator = removeLastDigit(expression.operator);
     }
     else {
-      expression.firstTerm = removeLastDigit(expression.firstTerm);
-      display = ['', 'removeTheLast'];
+      expression.b = removeLastDigit(expression.b);
     }
   }
-  else if (expression.operator) {
-    if (!expression.secondTerm) {
-      expression.operator = removeLastDigit(expression.operator);
-      display = ['', 'removeTheLast'];
+  display = removeLastDigit(display);
+}
 
+const handleOperators = (value) => {
+  if (!expression.a) {
+    return ;
+  }
+  else if (!expression.operator) {
+    expression.evaluated = false;
+    expression.operator = value;
+    display += value;
+  }
+  else {
+    if (!expression.b) {
+      expression.operator = value;
+      display = removeLastDigit(display) + value;
     }
     else {
-      expression.secondTerm = removeLastDigit(expression.secondTerm);
-      display = ['', 'removeTheLast'];
+      if (expression.b == '0') {
+        expression.a = operate(expression).toString();
+        display = expression.a;
+      }
+      else {
+        expression.a = operate(expression).toString();
+        expression.b = '';
+        display = expression.a + value;
+        expression.operator = value;
+      }
+    }
+  }
+}
+
+const handleDecimalPoint = () => {
+  if (!expression.operator) {
+    if (expression.evaluated == true) {
+      if (!expression.a.includes('.')) {
+        expression.evaluated = false;
+      }
+    }
+    if (expression.a[expression.a.length - 1] == '.') {
+      expression.a = removeLastDigit(expression.a);
+    }
+    else if (!expression.a) {
+      expression.a = '0.';
+    }
+    else {
+      if (!expression.a.includes('.')) {
+        expression.a += '.';
+      }
+      else {
+        return ;
+      }
+    }
+  }
+  else {
+    if (expression.b[expression.b.length - 1] == '.') {
+      expression.b = removeLastDigit(expression.b);
+    }
+    else if (!expression.b) {
+      expression.b = '0.';
+    }
+    else {
+      if (!expression.b.includes('.')) {
+        expression.b += '.';
+      }
+      else {
+        return ;
+      }
     }
   }
 }
 
 const handleEquals = () => {
-  if (expression.firstTerm) { // if the firstTerm is not empty
-    if (expression.operator) { // if the operator is set
-      if (!expression.secondTerm) { // but the secondTerm is not set
-        expression.operator = '' // then remove the last operator
-      } 
-    }
-    operate(expression);
-    display = [operate(expression)];
+  if (!expression.b) {
+    return ;
   }
-  else { // if equals is pressed before everything or after a clear
-    display = ['0'];
-  }
-  return display;
-}
-
-const handleOperators = (value) => {
-  // if the last clicked was the decimal sign, remove it first
-  if (expression.firstTerm[expression.firstTerm.length - 1] == '.') {
-    expression.firstTerm = removeLastDigit(expression.firstTerm);
-    displayValue(['', 'removeTheLast']);
-  }
-  if (expression.firstTerm == '') { // if the firstTerm is not set yet
-    display = ['', 'add'];
-  }
-  else if (expression.firstTerm != '') { // if the firstTerm is already set
-    if (!expression.operator) { // if the operator is not set yet
-      if (expression.firstTerm == 'Infinity' || expression.firstTerm == 'NaN') {
-        expression.firstTerm = '0';
-        expression.operator = value;
-        display = ['0' + value]
-      }
-      else {
-        expression.operator = value;
-        display = [value, 'add'];
-      }
-    }
-    else if (!expression.secondTerm) { // if we are selecting the operator multiple times
-      expression.operator = value;
-      display = [value, 'changeTheLast']
-    }
-    else { // if I set the secondTerm and press operator
-      operate(expression); // return the result of the expression
-      display = [operate(expression) + value]; // save for display
-      expression.operator = value; // add the new sign in the expression obj
-    }
-  }
-}
-
-const handleDecimalPoint = (value) => {
-  // decimal toggle function
-  if (!expression.operator) { // first term decimal
-    if (expression.evaluated === true) { // decimal behavior after equals: add it like operators
-      expression.evaluated = false;
-    }
-    // handleDecimalPoint(expression.firstTerm);
-    if (expression.firstTerm == '') {
-      expression.firstTerm += '0' + value;
-      display = ['0' + value, 'add'];
-    }
-    else if (expression.firstTerm == 'Infinity' || expression.firstTerm == 'NaN') {
-      expression.firstTerm = '0' + value;
-      display = ['0' + value];
-    }
-    else if (!expression.firstTerm.includes(value)) {
-      expression.firstTerm += value;
-      display = [value, 'add'];
-    }
-    else {
-      if (expression.firstTerm[expression.firstTerm.length - 1] == '.') { // remove the last ony if it's the dot
-        expression.firstTerm = removeLastDigit(expression.firstTerm);
-        display = ['', 'removeTheLast'];
-      }
-      else {
-        display = ['', 'add'];
-      }
-    }
-  }
-  else { // second term decimal (SAME FUNCTION, MERGE)
-    if (expression.secondTerm == '') {
-      expression.secondTerm += '0' + value;
-      display = ['0' + value, 'add'];
-    }
-    else if (!expression.secondTerm.includes(value)) {
-      expression.secondTerm += value;
-      display = [value, 'add'];
-    }
-    else {
-      if (expression.secondTerm[expression.secondTerm.length - 1] == '.') { // remove the last ony if it's the dot
-        expression.secondTerm = removeLastDigit(expression.secondTerm);
-        display = ['', 'removeTheLast'];
-      }
-      else {
-        display = ['', 'add'];
-      }
-    }
+  else {
+    expression.a = operate(expression).toString();
+    expression.operator = '';
+    expression.b = '';
+    expression.evaluated = true;
   }
 }
 
 const handleNumbers = (value) => {
-  if (!expression.operator) { // firstTerm digiting rules
-    if (expression.firstTerm == '0' || expression.firstTerm == '') {
-      expression.firstTerm = value; // managing the zero at the beginning
-      display = [value];
-    }
-    else if (expression.evaluated === true) { // behavior right after evaluation: clear
-      handleClear();
-      expression.firstTerm = value;
-      display = [value];
+  if (expression.evaluated == true) {
+    clear();
+  }
+  if (!expression.operator) {
+    if (expression.a == '0') {
+      expression.a = value;
     }
     else {
-      expression.firstTerm += value;
-      display = [value, 'add'];
+      expression.a += value;
     }
   }
-  else if (expression.operator) { // secondTerm digiting rules
-    if (expression.secondTerm == '0') {
-      expression.secondTerm = value; // managing the zero at the beginning
-      display = [value, 'changeTheLast'];
+  else {
+    if (expression.b == '0') {
+      expression.b = value;
     }
     else {
-      expression.secondTerm += value;
-      display = [value, 'add'];
+      expression.b += value;
     }
   }
 }
 
-/* ------------------- EVENT LISTENER ------------------- */
+/* ------------------- MAIN FUNCTION ------------------- */
 buttonNodeList.forEach(item => {
   document.body.addEventListener('keydown', (e) => {
     if (e.key == item.textContent) {
       item.click();
     }
   })
-  item.addEventListener('click', () => {
-    const value = item.textContent;
+  item.addEventListener('click', (e) => {
+    let value = e.target.value;
+    checkError();
     if (value == 'c') {
-      handleClear();
+      clear();
     }
-    else if (value == '<<') {
+    else if (value == '_') { // value for backspace
       handleBackspace();
-    }
-    else if (value == '=') {
-      handleEquals();
     }
     else if (['+', '-', '*', '/'].includes(value)) {
       handleOperators(value);
     }
     else if (value == '.') {
-      handleDecimalPoint(value);
+      handleDecimalPoint();
+    }
+    else if (value == '=') {
+      handleEquals();
     }
     else {
       handleNumbers(value);
     }
-    displayValue(display);
     console.log(expression)
+    updateDisplay();
   })
 })
 
