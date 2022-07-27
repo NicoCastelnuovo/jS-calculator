@@ -32,9 +32,12 @@ const operate = (expression) => {
   else if (expression.operator == '/') {
     result = divide(a, b);
   }
-  // if (result % 1 != 0) {
-  //   return parseFloat(result.toFixed(4));
-  // }
+  result = result || 0;
+  if (result != 'Error') {
+    if (result % 1 != 0) {
+      return parseFloat(result.toFixed(4));
+    }
+  }
   return result;
 };
 
@@ -48,7 +51,7 @@ const removeLastDigit = (n) => {
 };
 
 const checkError = () => {
-  expression.a == 'Error' ? clear() : null; // null??????????
+  expression.a == 'Error' ? clear() : null;
 };
 
 const clear = () => {
@@ -136,54 +139,72 @@ const handleNumbers = (value, expressionTerm) => {
   return expressionTerm += value;
 }
 
-/* ------------------- MAIN FUNCTION ------------------- */
-buttonNodeList.forEach(item => {
-  document.body.addEventListener('keydown', (e) => {
+const handleKeyboardSupport = (e, item) => {
+  if (e.key == 'c') {
+    if (item.textContent == 'C') {
+      item.click();
+    }
+  }
+  else if (e.key == 'Backspace' || e.key == '<') {
+    if (item.textContent == '<') {
+      item.click();
+    }
+  }
+  else {
     if (e.key == item.textContent) {
       item.click();
     }
-  })
-  item.addEventListener('click', (e) => {
-    let value = e.target.value;
-    checkError();
-    if (value == 'c') {
-      clear();
-    }
-    else if (value == '_') {
-      handleBackspace();
-    }
-    else if (['+', '-', '*', '/'].includes(value)) {
-      handleOperators(value);
-    }
-    else if (value == '.') {
-      if (!expression.operator) {
-        if (expression.evaluated == true) {
-          if (!expression.a.includes('.')) {
-            expression.evaluated = false;
-          }
+  }
+}
+
+const handleClick = (value) => {
+  checkError();
+  if (value == 'c') {
+    clear();
+  }
+  else if (value == '_') {
+    handleBackspace();
+  }
+  else if (['+', '-', '*', '/'].includes(value)) {
+    handleOperators(value);
+  }
+  else if (value == '.') {
+    if (!expression.operator) {
+      if (expression.evaluated == true) {
+        if (!expression.a.includes('.')) {
+          expression.evaluated = false;
         }
-        expression.a = handleDecimalPoint(expression.a);
       }
-      else {
-        expression.b = handleDecimalPoint(expression.b);
-      }
-    }
-    else if (value == '=') {
-      handleEquals();
+      expression.a = handleDecimalPoint(expression.a);
     }
     else {
-      if (expression.evaluated == true) {
-        clear();
-      }
-      if (!expression.operator) {
-        expression.a = handleNumbers(value, expression.a);
-      }
-      else {
-        expression.b = handleNumbers(value, expression.b);
-      }
+      expression.b = handleDecimalPoint(expression.b);
     }
-    console.log(expression)
-    updateDisplay();
+  }
+  else if (value == '=') {
+    handleEquals();
+  }
+  else {
+    if (expression.evaluated == true) {
+      clear();
+    }
+    if (!expression.operator) {
+      expression.a = handleNumbers(value, expression.a);
+    }
+    else {
+      expression.b = handleNumbers(value, expression.b);
+    }
+  }
+  updateDisplay();
+}
+
+/* ------------------- MAIN FUNCTION ------------------- */
+buttonNodeList.forEach(item => {
+  window.addEventListener('keydown', (e) => {
+    handleKeyboardSupport(e, item);
+  })
+  item.addEventListener('click', (e) => {
+    handleClick(e.target.value, item);
   })
 })
 
