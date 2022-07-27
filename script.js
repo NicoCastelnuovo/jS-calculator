@@ -2,40 +2,25 @@
 const current = document.querySelector('.current');
 const buttonNodeList = document.querySelectorAll('.button');
 
-/* ------------------- GLOBALS ------------------- */
+/* ------------------- GLOBAL VARIABLES ------------------- */
 let expression = {
   a: '',
   operator: '', 
   b: '',
-  evaluated: false
-}
-let display = '';
-
-/* ------------------- BASIC MATH FUNCTIONS ------------------- */
-const sum = (a, b) => {
-  return a + b;
-}
-const subtract = (a, b) => {
-  return a - b;
-}
-const multiply = (a, b) => {
-  return a * b;
-}
-const divide = (a, b) => {
-  if (a / b == 'Infinity') {
-    return 'Error';
-  }
-  return a / b;
+  evaluated: false,
 }
 
-/* ------------------- OPERATE FUNCTION ------------------- */
+/* ------------------- MATH FUNCTIONS ------------------- */
+const sum = (a, b) => a + b;
+const subtract = (a, b) => a - b;
+const multiply = (a, b) => a * b;
+const divide = (a, b) => a / b == 'Infinity' ? 'Error' : a / b;
+
 const operate = (expression) => {
   let a = parseFloat(expression.a)
   let b = parseFloat(expression.b)
   let result;
-  if (!a) { return 'Error'}
-  if (!b) { return 'Error'}
-  if (expression.operator == '+') {
+  if (expression.operator == '+') { 
     result = sum(a, b);
   } 
   else if (expression.operator == '-') {
@@ -47,40 +32,35 @@ const operate = (expression) => {
   else if (expression.operator == '/') {
     result = divide(a, b);
   }
-  if (result % 1 != 0) {
-    return parseFloat(result.toFixed(4));
-  }
+  // if (result % 1 != 0) {
+  //   return parseFloat(result.toFixed(4));
+  // }
   return result;
 };
 
-// const updateDisplay = (value) => {
-//   current.textContent = value;
-// }
+/* -------------- HANDLERS & REUSABLE FUNCTIONS -------------- */
 const updateDisplay = () => {
   current.textContent = expression.a + expression.operator + expression.b;
-}
+};
 
 const removeLastDigit = (n) => {
   return n.slice(0, n.length - 1);
-}
+};
 
 const checkError = () => {
-  if (expression.a == 'Error') {
-    clear();
-  }
-}
+  expression.a == 'Error' ? clear() : null; // null??????????
+};
 
 const clear = () => {
   expression = {
     a: '',
     operator: '', 
     b: '',
-    evaluated: false
+    evaluated: false,
   }
-  display = '';
-}
+};
 
-const handleBackspace = () => {
+const handleBackspace = () => { 
   if (!expression.operator) {
     expression.a = removeLastDigit(expression.a);
   }
@@ -92,74 +72,47 @@ const handleBackspace = () => {
       expression.b = removeLastDigit(expression.b);
     }
   }
-  display = removeLastDigit(display);
 }
 
 const handleOperators = (value) => {
   if (!expression.a) {
     return ;
   }
-  else if (!expression.operator) {
-    expression.evaluated = false;
-    expression.operator = value;
-    display += value;
-  }
   else {
-    if (!expression.b) {
-      expression.operator = value;
-      display = removeLastDigit(display) + value;
+    if (!expression.operator) {
+      expression.evaluated = false;
     }
     else {
-      if (expression.b == '0') {
-        expression.a = operate(expression).toString();
-        display = expression.a;
+      if (!expression.b) {
+        expression.operator = value;
       }
       else {
         expression.a = operate(expression).toString();
         expression.b = '';
-        display = expression.a + value;
-        expression.operator = value;
       }
+    }
+    if (expression.a == 'Error') {
+      expression.operator = '';
+    }
+    else {
+      expression.operator = value;
     }
   }
 }
 
-const handleDecimalPoint = () => {
-  if (!expression.operator) {
-    if (expression.evaluated == true) {
-      if (!expression.a.includes('.')) {
-        expression.evaluated = false;
-      }
-    }
-    if (expression.a[expression.a.length - 1] == '.') {
-      expression.a = removeLastDigit(expression.a);
-    }
-    else if (!expression.a) {
-      expression.a = '0.';
-    }
-    else {
-      if (!expression.a.includes('.')) {
-        expression.a += '.';
-      }
-      else {
-        return ;
-      }
-    }
+const handleDecimalPoint = (expressionTerm) => {
+  if (expressionTerm[expressionTerm.length - 1] == '.') {
+    return expressionTerm = removeLastDigit(expressionTerm);
+  }
+  else if (!expressionTerm) {
+    return expressionTerm = '0.';
   }
   else {
-    if (expression.b[expression.b.length - 1] == '.') {
-      expression.b = removeLastDigit(expression.b);
-    }
-    else if (!expression.b) {
-      expression.b = '0.';
+    if (!expressionTerm.includes('.')) {
+      return expressionTerm += '.';
     }
     else {
-      if (!expression.b.includes('.')) {
-        expression.b += '.';
-      }
-      else {
-        return ;
-      }
+      return expressionTerm;
     }
   }
 }
@@ -176,26 +129,11 @@ const handleEquals = () => {
   }
 }
 
-const handleNumbers = (value) => {
-  if (expression.evaluated == true) {
-    clear();
+const handleNumbers = (value, expressionTerm) => {
+  if (expressionTerm == '0') {
+    expressionTerm = value;
   }
-  if (!expression.operator) {
-    if (expression.a == '0') {
-      expression.a = value;
-    }
-    else {
-      expression.a += value;
-    }
-  }
-  else {
-    if (expression.b == '0') {
-      expression.b = value;
-    }
-    else {
-      expression.b += value;
-    }
-  }
+  return expressionTerm += value;
 }
 
 /* ------------------- MAIN FUNCTION ------------------- */
@@ -211,20 +149,38 @@ buttonNodeList.forEach(item => {
     if (value == 'c') {
       clear();
     }
-    else if (value == '_') { // value for backspace
+    else if (value == '_') {
       handleBackspace();
     }
     else if (['+', '-', '*', '/'].includes(value)) {
       handleOperators(value);
     }
     else if (value == '.') {
-      handleDecimalPoint();
+      if (!expression.operator) {
+        if (expression.evaluated == true) {
+          if (!expression.a.includes('.')) {
+            expression.evaluated = false;
+          }
+        }
+        expression.a = handleDecimalPoint(expression.a);
+      }
+      else {
+        expression.b = handleDecimalPoint(expression.b);
+      }
     }
     else if (value == '=') {
       handleEquals();
     }
     else {
-      handleNumbers(value);
+      if (expression.evaluated == true) {
+        clear();
+      }
+      if (!expression.operator) {
+        expression.a = handleNumbers(value, expression.a);
+      }
+      else {
+        expression.b = handleNumbers(value, expression.b);
+      }
     }
     console.log(expression)
     updateDisplay();
