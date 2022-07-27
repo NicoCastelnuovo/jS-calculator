@@ -14,7 +14,12 @@ let expression = {
 const sum = (a, b) => a + b;
 const subtract = (a, b) => a - b;
 const multiply = (a, b) => a * b;
-const divide = (a, b) => a / b == 'Infinity' ? 'Error' : a / b;
+const divide = (a, b) => {
+  if (a / b == 'Infinity' || a / b == '-Infinity') {
+    return 'Error';
+  }
+  return a / b;
+}
 
 const operate = (expression) => {
   let a = parseFloat(expression.a)
@@ -41,7 +46,7 @@ const operate = (expression) => {
   return result;
 };
 
-/* -------------- HANDLERS & REUSABLE FUNCTIONS -------------- */
+/* -------------- INPUT FUNCTIONS -------------- */
 const updateDisplay = () => {
   current.textContent = expression.a + expression.operator + expression.b;
 };
@@ -134,24 +139,24 @@ const handleEquals = () => {
 
 const handleNumbers = (value, expressionTerm) => {
   if (expressionTerm == '0') {
-    expressionTerm = value;
+    return expressionTerm = value;
   }
   return expressionTerm += value;
 }
 
-const handleKeyboardSupport = (e, item) => {
-  if (e.key == 'c') {
+const handleKeyboardSupport = (key, item) => {
+  if (key == 'c') {
     if (item.textContent == 'C') {
       item.click();
     }
   }
-  else if (e.key == 'Backspace' || e.key == '<') {
+  else if (key == 'Backspace' || key == '<') {
     if (item.textContent == '<') {
       item.click();
     }
   }
   else {
-    if (e.key == item.textContent) {
+    if (key == item.textContent) {
       item.click();
     }
   }
@@ -198,10 +203,10 @@ const handleClick = (value) => {
   updateDisplay();
 }
 
-/* ------------------- MAIN FUNCTION ------------------- */
+/* ------------------- HANDLER CLICK/KEYDOWN ------------------- */
 buttonNodeList.forEach(item => {
   window.addEventListener('keydown', (e) => {
-    handleKeyboardSupport(e, item);
+    handleKeyboardSupport(e.key, item);
   })
   item.addEventListener('click', (e) => {
     handleClick(e.target.value, item);
