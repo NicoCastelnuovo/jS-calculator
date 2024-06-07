@@ -1,3 +1,3 @@
 # jS-calculator
  
-Preview: https://nicocastelnuovo.github.io/calculator-jS-brainnest/
+Preview: https://ncasteln.github.io/calculator-jS-brainnest/
